@@ -59,6 +59,10 @@ class Motor(object):
 
     def set_output_state(self):
         self._debug_out('Setting brick output state...')
+
+        # Normalise power.
+        self.power = min(128, max(-127, self.power))
+
         self.brick.set_output_state(self.port, self.power, self.mode, self.regulation, self.turn_ratio, self.run_state, self.tacho_limit)
         self._debug_out('State set.')
 
@@ -76,7 +80,7 @@ class Motor(object):
         self.brick.reset_motor_position(self.port, relative)
 
     def run(self, power=100, regulated=1):
-        '''Unlike update(), set_power() tells the motor to run continuously.'''
+        '''Unlike update(), run() tells the motor to run continuously.'''
         self.power = power
         if regulated:
             self.mode = MODE_MOTOR_ON | MODE_REGULATED
@@ -110,6 +114,7 @@ the number of degrees to apply power for. Braking is wether or not to stop the
 motor after turning the specified degrees (unreliable). max_retries is the
 maximum times an internal loop of the braking function runs, so it doesn't get
 caught in an infinite loop (deprecated, do not use).'''
+
         if max_retries != -1:
             print 'Warning: max_retries is deprecated and is not longer needed, please do not use it!'
 
